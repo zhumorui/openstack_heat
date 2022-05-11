@@ -99,7 +99,8 @@ resources:
             systemctl start mariadb.service
  
             # create wordpress database
-            mysql -u root --password="__mysql_root_password__" <<EOF
+            mysqladmin -u root --password="__mysql_root_password__" 
+            cat <<EOF | mysql -u root --password="__mysql_root_password__"
             CREATE DATABASE __database_name__;
             CREATE USER '__database_user__'@'localhost';
             SET PASSWORD FOR '__database_user__'@'localhost'=PASSWORD("__database_password__");
