@@ -97,18 +97,15 @@ resources:
             touch /var/log/mariadb/mariadb.log
             chown mysql.mysql /var/log/mariadb/mariadb.log
             systemctl start mariadb.service
- 
-            # create wordpress database
-            mysqladmin -u root --password="__mysql_root_password__" 
-            cat <<EOF | mysql -u root --password="__mysql_root_password__"
+
+            # Setup MySQL root password and create a user
+            mysqladmin -u root password __mysql_root_password__
+            cat << EOF | mysql -u root --password=__mysql_root_password__
             CREATE DATABASE __database_name__;
-            CREATE USER '__database_user__'@'localhost';
-            SET PASSWORD FOR '__database_user__'@'localhost'=PASSWORD("__database_password__");
-            GRANT ALL PRIVILEGES ON __database_name__.* TO '__database_user__'@'localhost' IDENTIFIED BY '__database_password__';
-            CREATE USER '__database_user__'@'%';
-            SET PASSWORD FOR '__database_user__'@'%'=PASSWORD("__database_password__");
-            GRANT ALL PRIVILEGES ON __database_name__.* TO '__database_user__'@'%' IDENTIFIED BY '__database_password__';
+            GRANT ALL PRIVILEGES ON __database_name__.* TO "db_user"@"%"
+            IDENTIFIED BY "__mysql_root_password__";
             FLUSH PRIVILEGES;
+            EXIT
             EOF
  
             # notify heat that we are done here
