@@ -12,7 +12,7 @@ parameters:
   key_name:
     type: string
     description: Name of a KeyPair to enable SSH access to the instance
-    default: test_key
+    default: my_key
 
   instance_type:
     type: string
@@ -90,6 +90,8 @@ resources:
         str_replace:
           template: |
             #!/bin/bash -v
+
+            sed -i "s/metalink=https/metalink=http/" /etc/yum.repos.d/*
 
             yum -y install mariadb mariadb-server
             touch /var/log/mariadb/mariadb.log
