@@ -123,7 +123,8 @@ resources:
         str_replace:
           template: |
             #!/bin/bash -v
-
+            sed -i "s/metalink=https/metalink=http/" /etc/yum.repos.d/*
+            
             yum -y install httpd wordpress
 
             sed -i "/Deny from All/d" /etc/httpd/conf.d/wordpress.conf

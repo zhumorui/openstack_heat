@@ -7,7 +7,7 @@ parameters:
     type: string
     label: Image name or ID
     description: Image to be used for server. Please use an Ubuntu based image.
-    default: fedora-20.x86_64
+    default: 	ubuntu-14.04.1-server-amd64
   flavor:
     type: string
     label: Flavor
@@ -88,10 +88,9 @@ resources:
           template: |
             #!/bin/bash -ex
 
-            sed -i "s/metalink=https/metalink=http/" /etc/yum.repos.d/*
-
             # install dependencies
-            yum -y install apache2 php5 libapache2-mod-php5 php5-mysql php5-gd mysql-client
+            apt-get update
+            apt-get -y install apache2 php5 libapache2-mod-php5 php5-mysql php5-gd mysql-client
 
             # download wordpress
             wget http://wordpress.org/latest.tar.gz

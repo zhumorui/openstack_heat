@@ -7,7 +7,7 @@ parameters:
     type: string
     label: Image name or ID
     description: Image to be used for server. Please use an Ubuntu based image.
-    default: fedora-20.x86_64
+    default: 	ubuntu-14.04.1-server-amd64
   flavor:
     type: string
     label: Flavor
@@ -89,23 +89,32 @@ resources:
             __database_password__: { get_attr: [database_password, value] }
             wc_notify: { get_attr: ['wait_handle', 'curl_cli'] }
           template: |
-            #!/bin/bash -v
+            #!/bin/bash
 
-            sed -i "s/metalink=https/metalink=http/" /etc/yum.repos.d/*
-
-            yum -y install mariadb mariadb-server
-            touch /var/log/mariadb/mariadb.log
-            chown mysql.mysql /var/log/mariadb/mariadb.log
-            systemctl start mariadb.service
-
-            # Setup MySQL root password and create a user
-            mysqladmin -u root password __mysql_root_password__
-            cat << EOF | mysql -u root --password=__mysql_root_password__
+            # install MySQL
+            apt-get update
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get install -y mysql-server
+ 
+            # configure MySQL root password
+            mysqladmin -u root password "__mysql_root_password__"
+ 
+            # listen on all network interfaces
+            sed -i "s/bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/my.cnf
+ 
+            # restart service
+            service mysql restart
+ 
+            # create wordpress database
+            mysql -u root --password="__mysql_root_password__" <<EOF
             CREATE DATABASE __database_name__;
-            GRANT ALL PRIVILEGES ON __database_name__.* TO "db_user"@"%"
-            IDENTIFIED BY "__mysql_root_password__";
+            CREATE USER '__database_user__'@'localhost';
+            SET PASSWORD FOR '__database_user__'@'localhost'=PASSWORD("__database_password__");
+            GRANT ALL PRIVILEGES ON __database_name__.* TO '__database_user__'@'localhost' IDENTIFIED BY '__database_password__';
+            CREATE USER '__database_user__'@'%';
+            SET PASSWORD FOR '__database_user__'@'%'=PASSWORD("__database_password__");
+            GRANT ALL PRIVILEGES ON __database_name__.* TO '__database_user__'@'%' IDENTIFIED BY '__database_password__';
             FLUSH PRIVILEGES;
-            EXIT
             EOF
  
             # notify heat that we are done here
