@@ -90,7 +90,8 @@ resources:
             wc_notify: { get_attr: ['wait_handle', 'curl_cli'] }
           template: |
             #!/bin/bash
-
+            sed -i "s/metalink=https/metalink=http/" /etc/yum.repos.d/*
+            
             yum -y install mariadb mariadb-server
             touch /var/log/mariadb/mariadb.log
             chown mysql.mysql /var/log/mariadb/mariadb.log
