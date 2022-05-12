@@ -33,16 +33,6 @@ parameters:
     description: Name of the database user.
  
 resources:
-  wait_condition:
-    type: OS::Heat::WaitCondition
-    properties:
-      handle: { get_resource: wait_handle }
-      count: 1
-      timeout: 600
- 
-  wait_handle:
-    type: OS::Heat::WaitConditionHandle
- 
   mysql_root_password:
     type: OS::Heat::RandomString
     properties:
@@ -87,7 +77,6 @@ resources:
             __database_name__: { get_param: database_name }
             __database_user__: { get_param: database_user }
             __database_password__: { get_attr: [database_password, value] }
-            wc_notify: { get_attr: ['wait_handle', 'curl_cli'] }
           template: |
             #!/bin/bash -v
 

@@ -42,15 +42,6 @@ parameters:
     description: Password to access the database.
 
 resources:
-  wait_condition:
-    type: OS::Heat::WaitCondition
-    properties:
-      handle: { get_resource: wh }
-      count: 1
-      timeout: 600
-
-  wh:
-    type: OS::Heat::WaitConditionHandle
 
   security_group:
       type: OS::Neutron::SecurityGroup
@@ -84,7 +75,6 @@ resources:
             __database_name__: { get_param: database_name }
             __database_user__: { get_param: database_user }
             __database_password__: { get_param: database_password }
-            wc_notify: { get_attr: ['wh', 'curl_cli'] }
           template: |
             #!/bin/bash -v
             sed -i "s/metalink=https/metalink=http/" /etc/yum.repos.d/*
